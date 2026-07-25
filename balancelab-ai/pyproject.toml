@@ -21,6 +21,11 @@ dependencies = [
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
     "uvicorn>=0.30",
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    # psycopg 3.3 returns the server version as bytes, which SQLAlchemy 2.0's
+    # psycopg dialect cannot parse; pin to the 3.2 line until that is resolved.
+    "psycopg[binary]>=3.2,<3.3",
 ]
 
 [project.optional-dependencies]

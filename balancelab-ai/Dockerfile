@@ -17,6 +17,12 @@ COPY src ./src
 
 RUN pip install --no-cache-dir .
 
+# Migration assets, so the image can apply migrations (e.g. via compose:
+# `python -m alembic upgrade head` or `python scripts/check_migrations.py`).
+COPY alembic.ini ./
+COPY infra ./infra
+COPY scripts ./scripts
+
 # Run as an unprivileged user (least privilege).
 RUN useradd --create-home --uid 10001 appuser
 USER appuser

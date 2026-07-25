@@ -1,9 +1,9 @@
 # Architecture
 
-This document describes the BalanceLab AI architecture as implemented at
-milestone **M0**, and the seams left for later milestones. It complements
-[`SPEC.md`](SPEC.md) §5 (which describes the full target system) by stating what
-is actually built today.
+This document describes the BalanceLab AI architecture as implemented through
+milestone **M1 (persistence)**, and the seams left for later milestones. It
+complements [`SPEC.md`](SPEC.md) §5 (which describes the full target system) by
+stating what is actually built today.
 
 ## Layering
 
@@ -20,14 +20,37 @@ is actually built today.
 │   domain/     schemas + invariants                             │
 │   synthetic/  seeded generator + synthetic-only boundary       │
 │   calc/       versioned formulas + lineage engine              │
+├──────────────────────────────────────────────────────────────┤
+│ Storage    src/balancelab/storage                              │
+│   interfaces (Protocols) · in-memory backend · SQLAlchemy/PG   │
+│   backend · Alembic migrations (infra/migrations)              │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 **Dependency rule.** Dependencies point downward only. `domain`, `synthetic`,
-and `calc` never import `api`, FastAPI, or any provider SDK. This is what makes
+and `calc` never import `api`, `storage`, FastAPI, or any provider SDK. The
+storage layer depends on the domain (it reads/writes domain models) but nothing
+depends on a concrete backend — only on the storage Protocols. This is what makes
 the core testable in isolation and portable across delivery mechanisms
 (HTTP now, queue/CLI later). It is enforced by review and by the import
 structure; a lint rule can formalize it in a later milestone.
+
+## Storage layer (M1)
+
+The `storage` package defines typed repository Protocols (`PortfolioRepository`,
+`SnapshotRepository`, `UnitOfWork`) that speak domain models, with two
+interchangeable backends selected by `create_unit_of_work_factory`:
+
+- **In-memory** — used by tests and DB-less runs; a shared store outlives
+  individual units of work.
+- **SQLAlchemy / Postgres** — used when `database_url` is configured. Each table
+  stores the full domain object as JSONB (authoritative; reconstructed via
+  Pydantic) plus indexed scalar columns. Alembic migrations under
+  `infra/migrations` manage the schema.
+
+The API opens one unit of work per request (`api.dependencies.get_uow`),
+committing on success and rolling back on error. Writes are idempotent by id.
+See ADR 0006 for the rationale.
 
 ## Key decisions (see `docs/adr/`)
 
@@ -79,9 +102,9 @@ generic internal error so internals never leak.
 
 ## What is deliberately deferred
 
-Persistence (Postgres + migrations), model/provider adapters, scenario and
-forecast state machines, methodology retrieval, and explanation generation are
-**not** in M0. The layering leaves clear seams for them: new typed interfaces in
-the platform layer, new domain services below the API, and additional lineage
-node kinds. Deferred scope is tracked in `docs/adr/0005-deferred-scope.md` and
-`CHANGELOG.md`.
+Model/provider adapters, scenario and forecast state machines, methodology
+retrieval, and explanation generation are **not** built yet. Persistence
+(Postgres + migrations) landed in M1 (see above). The layering leaves clear seams
+for the rest: new typed interfaces in the platform/storage layers, new domain
+services below the API, and additional lineage node kinds. Deferred scope is
+tracked in `docs/adr/0005-deferred-scope.md` and `CHANGELOG.md`.

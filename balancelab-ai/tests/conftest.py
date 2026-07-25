@@ -13,9 +13,19 @@ from balancelab.config import Settings
 
 @pytest.fixture
 def settings() -> Settings:
-    """Deterministic test settings with the synthetic-only policy in force."""
+    """Deterministic test settings.
 
-    return Settings(environment="test", log_level="warning", synthetic_data_only=True)
+    ``database_url`` is pinned to ``None`` so app-level tests always use the
+    in-memory backend regardless of any ambient environment variable (CI sets a
+    Postgres URL only for the storage-contract and migration checks).
+    """
+
+    return Settings(
+        environment="test",
+        log_level="warning",
+        synthetic_data_only=True,
+        database_url=None,
+    )
 
 
 @pytest.fixture

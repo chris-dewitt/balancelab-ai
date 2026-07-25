@@ -16,6 +16,7 @@ from balancelab.api.health import router as health_router
 from balancelab.api.middleware import CorrelationIdMiddleware
 from balancelab.api.routes import router as v1_router
 from balancelab.config import Settings, get_settings
+from balancelab.storage import create_unit_of_work_factory
 from balancelab.telemetry import configure_logging
 
 
@@ -28,8 +29,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(
         title="BalanceLab AI",
         version=__version__,
-        summary="Deterministic synthetic balance-sheet forecasting core (M0).",
+        summary="Deterministic synthetic balance-sheet forecasting core.",
     )
+
+    # Choose the storage backend once (Postgres when configured, else in-memory).
+    app.state.settings = cfg
+    app.state.uow_factory = create_unit_of_work_factory(cfg)
 
     app.add_middleware(CorrelationIdMiddleware)
     register_exception_handlers(app)

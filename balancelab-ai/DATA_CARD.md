@@ -48,9 +48,12 @@ service while the `synthetic_data_only` policy is in force.
 
 ## Retention
 
-Nothing is persisted in M0; portfolios and snapshots are computed on demand and
-exist only for the life of the request/process. Retention/deletion policy for
-stored artifacts will be documented when persistence is added (M1).
+As of M1, portfolios and snapshots are persisted when a database is configured
+(otherwise they live only for the process lifetime, in memory). Stored data is
+synthetic only. A formal retention/deletion policy (TTL, purge tooling) is not
+yet implemented; because all stored data is synthetic and reproducible from a
+seed, dropping and recreating the database is the current reset path. This will
+be formalized alongside authentication and audit (M3).
 
 ## Provenance for future non-synthetic sources
 

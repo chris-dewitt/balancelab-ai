@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     # API surface.
     api_version: str = "v1"
 
+    # Persistence. When unset, the service uses an in-memory store (no durability)
+    # so it runs without a database; when set, the SQLAlchemy/Postgres backend is
+    # used. This is a connection URL, not a secret to embed — provide it via the
+    # environment (e.g. postgresql+psycopg://user:pass@host/db).
+    database_url: str | None = None
+
     # Deterministic-core guardrails. These are policy switches, not secrets.
     # The reconciliation tolerance bounds acceptable floating-point drift when
     # checking the balance-sheet identity; it is a currency-minor-unit amount.

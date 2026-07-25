@@ -6,6 +6,30 @@ milestone-based versioning during pre-release (see [`SPEC.md`](SPEC.md) §13).
 
 ## [Unreleased]
 
+### Added — Milestone M1 (persistence)
+
+- Storage layer (`balancelab.storage`): typed repository Protocols
+  (`PortfolioRepository`, `SnapshotRepository`, `UnitOfWork`) that speak domain
+  models, with two interchangeable backends selected by
+  `create_unit_of_work_factory` — an in-memory store (tests, DB-less runs) and a
+  SQLAlchemy 2.0 / Postgres backend (JSONB + indexed scalar columns).
+- Alembic migrations under `infra/migrations` (initial schema for portfolios and
+  snapshots), wired to application settings; `scripts/check_migrations.py` now
+  performs an offline SQL smoke always and `upgrade head` + `alembic check`
+  (drift detection) when a database is configured.
+- Persistence wired into the API: `POST /v1/portfolios/synthetic` and
+  `POST /v1/snapshots` persist their results (idempotent by id), and new
+  `GET /v1/portfolios/{id}` and `GET /v1/snapshots/{id}` retrieve them with a
+  structured 404 when absent. Readiness reports a database check when configured.
+- `BALANCELAB_DATABASE_URL` configuration (unset → in-memory backend).
+- Backend-agnostic storage contract tests (in-memory always; Postgres opt-in via
+  `BALANCELAB_TEST_DATABASE_URL`) plus API persistence e2e coverage.
+- CI runs a disposable Postgres service for the storage-contract and live
+  migration checks. docker-compose app service now consumes the database.
+- ADR 0006 (persistence and the storage boundary). psycopg pinned to the 3.2
+  line (3.3 returns the server version as bytes, which SQLAlchemy 2.0 cannot
+  parse).
+
 ### Added — Milestone M0 (deterministic core)
 
 - Repository contract and packaging: `pyproject.toml` (Python 3.12, ruff, mypy,
