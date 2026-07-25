@@ -18,6 +18,24 @@ jobs:
   checks:
     name: Lint, type, test, security, evals
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: balancelab
+          POSTGRES_PASSWORD: balancelab
+          POSTGRES_DB: balancelab_test
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U balancelab"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Disposable Postgres for the opt-in storage-contract tests. App-level
+      # tests pin database_url=None, so they remain in-memory and deterministic.
+      BALANCELAB_TEST_DATABASE_URL: postgresql+psycopg://balancelab:balancelab@localhost:5432/balancelab_test
     steps:
       - uses: actions/checkout@v4
 
@@ -42,7 +60,9 @@ jobs:
       - name: Unit, contract & integration tests (pytest)
         run: pytest -q
 
-      - name: Migration check
+      - name: Migration check (offline + live Postgres)
+        env:
+          BALANCELAB_DATABASE_URL: postgresql+psycopg://balancelab:balancelab@localhost:5432/balancelab_test
         run: python scripts/check_migrations.py
 
       - name: Security scan (bandit)

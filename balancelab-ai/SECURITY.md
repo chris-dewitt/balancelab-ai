@@ -55,10 +55,22 @@ and external writes.
   ID for traceability. Immutable audit events for approvals/consequential actions
   arrive with the approval workflow (M3).
 
-## Out of scope for M0 (tracked for later milestones)
+## Persistence (M1)
+
+- The database URL is configuration, sourced from `BALANCELAB_DATABASE_URL`, and
+  is never committed; only synthetic (and, when policy is relaxed, public) data is
+  stored. Stored records are the same validated domain models, reconstructed
+  through Pydantic on read so a tampered row cannot yield a malformed object.
+- Only the synthetic-labeled portfolios and their snapshots are persisted; the
+  synthetic-only boundary is still enforced before a snapshot is computed/stored.
+- Writes are idempotent by id, so retried requests do not duplicate records.
+- Still out of scope at this layer (tracked below): row-level access control and
+  encryption at rest, which arrive with authentication/authorization.
+
+## Out of scope (tracked for later milestones)
 
 - AuthN/AuthZ and scoped policy decisions for external writes.
-- Persistence-layer security (row-level access, encryption at rest).
+- Persistence-layer access control (row-level) and encryption at rest.
 - Model/provider key management and provider-side data handling.
 - Full audit-event store and replay.
 

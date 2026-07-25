@@ -30,6 +30,29 @@ def test_synthetic_to_snapshot_end_to_end(client: TestClient) -> None:
     assert {"total_asset", "total_liability", "total_equity", "balance_residual"} <= labels
 
 
+def test_persisted_portfolio_and_snapshot_are_retrievable(client: TestClient) -> None:
+    portfolio = client.post("/v1/portfolios/synthetic", json={"seed": 314}).json()
+    fetched_portfolio = client.get(f"/v1/portfolios/{portfolio['id']}")
+    assert fetched_portfolio.status_code == 200
+    assert fetched_portfolio.json()["id"] == portfolio["id"]
+
+    snapshot = client.post("/v1/snapshots", json={"portfolio": portfolio}).json()
+    fetched_snapshot = client.get(f"/v1/snapshots/{snapshot['id']}")
+    assert fetched_snapshot.status_code == 200
+    assert fetched_snapshot.json()["id"] == snapshot["id"]
+    # The snapshot's portfolio was persisted too, so it resolves.
+    assert client.get(f"/v1/portfolios/{snapshot['portfolio_id']}").status_code == 200
+
+
+def test_missing_records_return_structured_404(client: TestClient) -> None:
+    for path in ("/v1/portfolios/port_missing", "/v1/snapshots/snap_missing"):
+        response = client.get(path)
+        assert response.status_code == 404
+        body = response.json()
+        assert body["code"] == "not_found"
+        assert body["correlation_id"]
+
+
 def test_generation_is_reproducible_over_the_wire(client: TestClient) -> None:
     a = client.post("/v1/portfolios/synthetic", json={"seed": 11}).json()
     b = client.post("/v1/portfolios/synthetic", json={"seed": 11}).json()

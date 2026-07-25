@@ -9,7 +9,5 @@ tests
 docs
 evals
 examples
-infra
-scripts
 *.md
 !README.md

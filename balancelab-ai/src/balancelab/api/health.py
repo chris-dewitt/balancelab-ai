@@ -43,6 +43,12 @@ def readyz() -> ReadinessResponse:
         "config_loaded": bool(settings.app_name),
         "synthetic_data_only": settings.synthetic_data_only,
     }
+    # Only assert database connectivity when persistence is configured; the
+    # in-memory backend has nothing to probe.
+    if settings.database_url:
+        from balancelab.storage.session import ping
+
+        checks["database"] = ping(settings.database_url)
     ready = all(checks.values())
     return ReadinessResponse(
         status="ready" if ready else "not_ready",

@@ -7,13 +7,16 @@ runs **deterministic** balance-sheet forecasts, and explains every result with
 complete calculation lineage. Authoritative numbers are always computed by code,
 never authored by a language model.
 
-> **Status — M0 (in progress).** This repository currently ships the M0 vertical
-> slice: the synthetic-data boundary, typed domain schemas, deterministic
-> balance-sheet formulas with full lineage, a small FastAPI surface with
-> health/readiness and structured errors, telemetry, evaluation smoke tests, and
-> CI. Later milestones (M1–M5) add scenario CRUD, forecasting, methodology
-> retrieval, explanations, and ML comparison. **Do not treat planned
-> capabilities as shipped.** See [`SPEC.md`](SPEC.md) §13 for the milestone map.
+> **Status — M0 complete; M1 in progress (persistence).** This repository ships
+> the deterministic core (synthetic-data boundary, typed domain schemas,
+> balance-sheet formulas with full lineage, FastAPI surface with health/readiness
+> and structured errors, telemetry, evaluation smoke tests, CI) **plus the M1
+> persistence layer**: a typed storage boundary with in-memory and
+> SQLAlchemy/Postgres backends, Alembic migrations, and persisted portfolios and
+> snapshots. Remaining M1–M5 scope (upload validation, scenario CRUD,
+> forecasting, methodology retrieval, explanations, ML comparison) is not yet
+> built. **Do not treat planned capabilities as shipped.** See
+> [`SPEC.md`](SPEC.md) §13 for the milestone map.
 
 ## What problem this solves
 
@@ -49,8 +52,11 @@ Deterministic domain core         # framework-independent, fully typed
 (future) Postgres/artifacts, model providers, retrieval — deferred to M1+
 ```
 
-The domain core does not import FastAPI or any provider SDK. See
-[`ARCHITECTURE.md`](ARCHITECTURE.md) for details.
+The domain core does not import FastAPI, the storage layer, or any provider SDK.
+Persistence sits behind typed repository Protocols with in-memory and
+Postgres backends; the app runs without a database (in-memory) or with one when
+`BALANCELAB_DATABASE_URL` is set. See [`ARCHITECTURE.md`](ARCHITECTURE.md) for
+details.
 
 ## Local setup
 
@@ -64,15 +70,24 @@ pip install -e ".[dev]"
 
 ### Run the service
 
+Without a database (in-memory store — data is not durable):
+
 ```bash
 uvicorn balancelab.api.app:app --reload
-# then:
 curl localhost:8000/healthz
 curl localhost:8000/readyz
 ```
 
-Or bring up the app with its local dependency (Postgres, wired for M1) via
-Compose:
+With Postgres (durable), set the connection URL and apply migrations first:
+
+```bash
+export BALANCELAB_DATABASE_URL="postgresql+psycopg://user:pass@localhost:5432/balancelab"
+python -m alembic upgrade head
+uvicorn balancelab.api.app:app --reload
+```
+
+Or bring up the app with a local Postgres via Compose (see
+[`docker-compose.yml`](docker-compose.yml) for the migration step):
 
 ```bash
 docker compose up --build
@@ -87,7 +102,7 @@ ruff format --check .       # formatting
 ruff check .                # lint
 mypy                        # static typing (strict)
 pytest -q                   # unit, contract, integration & e2e tests
-python scripts/check_migrations.py   # migration check (M0: no-op)
+python scripts/check_migrations.py   # migrations: offline smoke; live check if DB configured
 bandit -q -c pyproject.toml -r src   # static security scan
 pip-audit --skip-editable --progress-spinner off   # dependency audit
 python -m evals.runner      # deterministic evaluation smoke suite
@@ -123,8 +138,10 @@ The HTTP equivalent: `POST /v1/portfolios/synthetic` then `POST /v1/snapshots`.
 | ------ | ---- | ----------- |
 | GET  | `/healthz` | Liveness. |
 | GET  | `/readyz`  | Readiness + core policy checks. |
-| POST | `/v1/portfolios/synthetic` | Generate a reproducible synthetic portfolio from a seed. |
-| POST | `/v1/snapshots` | Compute a fully-traced deterministic snapshot (enforces the synthetic-only boundary). |
+| POST | `/v1/portfolios/synthetic` | Generate and persist a reproducible synthetic portfolio from a seed. |
+| GET  | `/v1/portfolios/{id}` | Retrieve a stored portfolio (structured 404 if absent). |
+| POST | `/v1/snapshots` | Compute and persist a fully-traced deterministic snapshot (enforces the synthetic-only boundary). |
+| GET  | `/v1/snapshots/{id}` | Retrieve a stored snapshot (structured 404 if absent). |
 
 All responses carry an `X-Correlation-ID`; errors use a structured body
 (`code`, `message`, `correlation_id`, `details`). See
@@ -155,9 +172,9 @@ and least-privilege containers.
 ## Known limitations (M0)
 
 - Single-currency portfolios only; no multi-currency consolidation yet.
-- No persistence — snapshots are computed on demand, not stored.
-- No scenarios, forecasting, retrieval, explanations, or ML comparison yet
-  (M1–M5).
+- Persistence covers portfolios and snapshots; upload validation, scenarios,
+  forecasting, retrieval, explanations, and ML comparison are not built yet
+  (remaining M1–M5).
 - The synthetic generator produces balance-sheet totals only; income,
   liquidity, and risk calculations are deferred.
 
