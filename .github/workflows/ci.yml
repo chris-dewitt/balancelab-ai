@@ -62,4 +62,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build image
-        run: docker build -t balancelab-ai:ci balancelab-ai
+        # working-directory defaults to balancelab-ai (top-level defaults), so
+        # the build context is the current directory.
+        run: docker build -t balancelab-ai:ci .
