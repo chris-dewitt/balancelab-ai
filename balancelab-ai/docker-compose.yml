@@ -1,0 +1,37 @@
+# Local development dependencies for BalanceLab AI.
+#
+# M0 does not yet persist to Postgres, but the shared engineering standard calls
+# for Docker Compose to provide local dependencies. Postgres (with pgvector, for
+# later retrieval milestones) is defined here so the topology is ready and the
+# app service demonstrates the container running against it.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: balancelab
+      POSTGRES_PASSWORD: balancelab
+      POSTGRES_DB: balancelab
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U balancelab"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    environment:
+      BALANCELAB_ENVIRONMENT: local
+      # Not consumed by M0 code yet; wired for the persistence milestone.
+      BALANCELAB_DATABASE_URL: postgresql://balancelab:balancelab@db:5432/balancelab
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:

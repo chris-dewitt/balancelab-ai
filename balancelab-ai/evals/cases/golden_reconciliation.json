@@ -1,0 +1,65 @@
+{
+  "dataset": "balancelab-m0-reconciliation",
+  "version": "1",
+  "description": "Deterministic golden and adversarial cases for the M0 balance-sheet core. Golden cases pin exact totals to catch numerical regressions; adversarial cases assert the reconciliation invariant rejects unbalanced input.",
+  "data_origin": "synthetic",
+  "cases": [
+    {
+      "id": "golden-seed-1",
+      "kind": "golden",
+      "seed": 1,
+      "expect": {
+        "balances": true,
+        "total_assets": "2795680.67",
+        "total_liabilities": "4638282.08",
+        "total_equity": "-1842601.41",
+        "lineage_nodes": 10
+      }
+    },
+    {
+      "id": "golden-seed-7",
+      "kind": "golden",
+      "seed": 7,
+      "expect": {
+        "balances": true,
+        "total_assets": "6583581.11",
+        "total_liabilities": "3801462.86",
+        "total_equity": "2782118.25",
+        "lineage_nodes": 10
+      }
+    },
+    {
+      "id": "golden-seed-42",
+      "kind": "golden",
+      "seed": 42,
+      "expect": {
+        "balances": true,
+        "total_assets": "5263452.51",
+        "total_liabilities": "2737328.97",
+        "total_equity": "2526123.54",
+        "lineage_nodes": 10
+      }
+    },
+    {
+      "id": "golden-seed-2025",
+      "kind": "golden",
+      "seed": 2025,
+      "expect": {
+        "balances": true,
+        "total_assets": "13275210.32",
+        "total_liabilities": "3966709.77",
+        "total_equity": "9308500.55",
+        "lineage_nodes": 10
+      }
+    },
+    {
+      "id": "adversarial-unbalanced",
+      "kind": "adversarial",
+      "seed": 5,
+      "corrupt_first_asset_to": "0.01",
+      "expect": {
+        "reconciliation_failed": true
+      }
+    }
+  ]
+}
