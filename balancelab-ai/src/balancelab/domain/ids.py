@@ -16,6 +16,9 @@ INSTRUMENT: Final = "inst"
 CASHFLOW: Final = "cf"
 SNAPSHOT: Final = "snap"
 CALC_NODE: Final = "calc"
+SCENARIO: Final = "scen"
+ASSUMPTION: Final = "asmp"
+FORECAST_RUN: Final = "frun"
 
 
 def new_id(prefix: str) -> str:

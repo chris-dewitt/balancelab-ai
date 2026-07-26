@@ -8,6 +8,9 @@ returned as a generic internal error.
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
+from typing import Any
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -17,6 +20,24 @@ from balancelab.errors import BalanceLabError, ErrorBody, ErrorCode
 from balancelab.telemetry import get_logger
 
 _logger = get_logger("balancelab.api.errors")
+
+
+def sanitize_validation_errors(errors: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Reduce Pydantic/FastAPI error dicts to JSON-safe primitives.
+
+    Pydantic error entries can carry a ``ctx`` holding the original exception
+    object, which is not JSON-serializable. Keeping only ``loc``/``msg``/``type``
+    yields a safe, stable error payload.
+    """
+
+    return [
+        {
+            "loc": [str(part) for part in err.get("loc", ())],
+            "msg": str(err.get("msg", "")),
+            "type": str(err.get("type", "")),
+        }
+        for err in errors
+    ]
 
 
 def _json(body: ErrorBody, status_code: int) -> JSONResponse:
@@ -38,8 +59,7 @@ async def _handle_request_validation(_: Request, exc: RequestValidationError) ->
         code=ErrorCode.VALIDATION_ERROR,
         message="request validation failed",
         correlation_id=correlation_id,
-        # exc.errors() is already structured and safe (field locations + types).
-        details={"errors": exc.errors()},
+        details={"errors": sanitize_validation_errors(exc.errors())},
     )
     return _json(body, 422)
 

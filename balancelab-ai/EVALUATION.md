@@ -7,17 +7,18 @@ milestone **M0**.
 
 ## Dataset
 
-- **Name / version:** `balancelab-m0-reconciliation`, version `1`.
-- **Location:** `evals/cases/golden_reconciliation.json`.
-- **Data origin:** synthetic (seeded, reproducible). Labeled `data_origin:
-  synthetic` in the file.
+- `balancelab-m0-reconciliation` v1 — `evals/cases/golden_reconciliation.json`.
+- `balancelab-m1-forecast` v1 — `evals/cases/golden_forecast.json`.
 
-The dataset contains two case kinds:
+Both are synthetic (seeded, reproducible) and labeled `data_origin: synthetic`.
+
+Case kinds:
 
 | Kind | What it checks |
 | ---- | -------------- |
-| `golden` | Pins exact totals (`total_assets`, `total_liabilities`, `total_equity`) and lineage-node count per seed. Fails on any numerical change → **regression gate**. |
+| `golden` | Pins exact snapshot totals and lineage-node count per seed. Fails on any numerical change → **regression gate**. |
 | `adversarial` | Corrupts a balanced portfolio and asserts the engine raises a reconciliation error → **invariant enforcement**. |
+| `forecast` | Pins per-period category totals for a seed + growth-rate scenario over a horizon → **forecast regression gate** (and confirms the identity holds each period). |
 
 ## Metrics (M0)
 

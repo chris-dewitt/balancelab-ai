@@ -17,9 +17,11 @@ stating what is actually built today.
 │   typed settings · error taxonomy · correlation context · logs │
 ├──────────────────────────────────────────────────────────────┤
 │ Domain core (framework-independent, fully typed)               │
-│   domain/     schemas + invariants                             │
+│   domain/     schemas + invariants (portfolio, scenario,       │
+│               forecast, lineage)                               │
 │   synthetic/  seeded generator + synthetic-only boundary       │
-│   calc/       versioned formulas + lineage engine              │
+│   ingest/     upload validation (schema · policy · identity)   │
+│   calc/       versioned formulas · snapshot + forecast engines │
 ├──────────────────────────────────────────────────────────────┤
 │ Storage    src/balancelab/storage                              │
 │   interfaces (Protocols) · in-memory backend · SQLAlchemy/PG   │
@@ -83,6 +85,25 @@ POST /v1/snapshots {portfolio}
 Every request is assigned a correlation ID (honoring an inbound
 `X-Correlation-ID`), which is bound to the logging context and echoed on the
 response and in error bodies.
+
+## Scenarios and forecasts (M1)
+
+A `Scenario` is a bounded, versioned description of a forecast: a base portfolio,
+a horizon, and typed `Assumption`s (per-category growth rates in this slice;
+equity is never a target — it is a residual). `compute_forecast` projects assets
+and liabilities forward period by period and carries equity as
+`assets − liabilities`, so the balance-sheet identity holds in every period by
+construction. The result is a `ForecastRun` with per-period `ForecastValue`s and
+a full `CalculationNode` lineage stamped with `forecast-formulas@1`. Scenarios
+follow the immutability rule: there is no in-place update — a correction is a new
+scenario.
+
+## Upload validation (M1)
+
+`balancelab.ingest.validate_upload` is a dry-run validator: it builds a typed
+portfolio from an untrusted JSON/CSV payload and reports schema, data-origin
+policy, and reconciliation issues without persisting anything. It collects all
+issues rather than failing on the first, and never raises on bad input.
 
 ## Calculation lineage
 

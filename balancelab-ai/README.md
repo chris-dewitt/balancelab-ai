@@ -7,16 +7,16 @@ runs **deterministic** balance-sheet forecasts, and explains every result with
 complete calculation lineage. Authoritative numbers are always computed by code,
 never authored by a language model.
 
-> **Status — M0 complete; M1 in progress (persistence).** This repository ships
-> the deterministic core (synthetic-data boundary, typed domain schemas,
-> balance-sheet formulas with full lineage, FastAPI surface with health/readiness
-> and structured errors, telemetry, evaluation smoke tests, CI) **plus the M1
-> persistence layer**: a typed storage boundary with in-memory and
-> SQLAlchemy/Postgres backends, Alembic migrations, and persisted portfolios and
-> snapshots. Remaining M1–M5 scope (upload validation, scenario CRUD,
-> forecasting, methodology retrieval, explanations, ML comparison) is not yet
-> built. **Do not treat planned capabilities as shipped.** See
-> [`SPEC.md`](SPEC.md) §13 for the milestone map.
+> **Status — M0 complete; M1 complete.** This repository ships the deterministic
+> core (synthetic-data boundary, typed domain schemas, balance-sheet formulas
+> with full lineage, FastAPI surface, telemetry, evaluation smoke tests, CI) and
+> all of **M1**: a typed persistence boundary with in-memory and
+> SQLAlchemy/Postgres backends and Alembic migrations; upload validation;
+> versioned scenarios with CRUD; and a deterministic forecast engine with full
+> lineage. Remaining scope (M2–M5: lineage graph/exports, natural-language
+> scenario drafting + approval, methodology retrieval, explanations, ML
+> comparison) is not yet built. **Do not treat planned capabilities as shipped.**
+> See [`SPEC.md`](SPEC.md) §13 for the milestone map.
 
 ## What problem this solves
 
@@ -139,9 +139,15 @@ The HTTP equivalent: `POST /v1/portfolios/synthetic` then `POST /v1/snapshots`.
 | GET  | `/healthz` | Liveness. |
 | GET  | `/readyz`  | Readiness + core policy checks. |
 | POST | `/v1/portfolios/synthetic` | Generate and persist a reproducible synthetic portfolio from a seed. |
+| POST | `/v1/portfolios/validate` | Validate an uploaded balance sheet (JSON or CSV); returns a structured report, persists nothing. |
 | GET  | `/v1/portfolios/{id}` | Retrieve a stored portfolio (structured 404 if absent). |
 | POST | `/v1/snapshots` | Compute and persist a fully-traced deterministic snapshot (enforces the synthetic-only boundary). |
 | GET  | `/v1/snapshots/{id}` | Retrieve a stored snapshot (structured 404 if absent). |
+| POST | `/v1/scenarios` | Create a forecast scenario over an existing portfolio. |
+| GET  | `/v1/scenarios` · `/v1/scenarios/{id}` | List / retrieve scenarios. |
+| DELETE | `/v1/scenarios/{id}` | Delete a scenario. |
+| POST | `/v1/forecasts` | Run and persist a deterministic forecast for a scenario. |
+| GET  | `/v1/forecasts/{id}` · `/v1/forecasts/{id}/lineage` | Retrieve a forecast run / its calculation lineage. |
 
 All responses carry an `X-Correlation-ID`; errors use a structured body
 (`code`, `message`, `correlation_id`, `details`). See
@@ -172,9 +178,12 @@ and least-privilege containers.
 ## Known limitations (M0)
 
 - Single-currency portfolios only; no multi-currency consolidation yet.
-- Persistence covers portfolios and snapshots; upload validation, scenarios,
-  forecasting, retrieval, explanations, and ML comparison are not built yet
-  (remaining M1–M5).
+- Forecast assumptions are per-category growth rates over a bounded horizon;
+  rate shocks, macro paths, and per-account assumptions are deferred.
+- Upload validation is a dry run — validated uploads are not yet admitted to
+  storage (persisting uploads is deferred).
+- Natural-language scenario drafting, approval workflow, methodology retrieval,
+  explanations, and ML comparison are not built yet (M2–M5).
 - The synthetic generator produces balance-sheet totals only; income,
   liquidity, and risk calculations are deferred.
 

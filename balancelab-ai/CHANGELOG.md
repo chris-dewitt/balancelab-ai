@@ -6,6 +6,32 @@ milestone-based versioning during pre-release (see [`SPEC.md`](SPEC.md) §13).
 
 ## [Unreleased]
 
+### Added — Milestone M1 (upload validation, scenarios, forecast core)
+
+- Upload validation: `POST /v1/portfolios/validate` accepts a candidate balance
+  sheet as JSON or CSV and returns a structured, non-persisting
+  `ValidationReport` checking schema, the data-origin policy, and the
+  balance-sheet identity. New `balancelab.ingest` package; all issues are
+  collected rather than failing on the first.
+- Scenario/forecast domain schemas (`Assumption`, `Scenario`, `ForecastValue`,
+  `ForecastRun`) — immutable, typed, with per-category growth-rate assumptions
+  and a bounded horizon; equity may not be a growth target.
+- Deterministic forecast engine (`balancelab.calc.forecast`, formulas
+  `forecast-formulas@1`): projects assets/liabilities by growth rate and carries
+  equity as a residual so the identity holds every period; emits full
+  `CalculationNode` lineage.
+- Scenario CRUD: `POST/GET/DELETE /v1/scenarios` and `GET /v1/scenarios`
+  (paginated, newest first); creation validates the base portfolio exists.
+  Per the immutability rule, there is no in-place update.
+- Forecast routes: `POST /v1/forecasts`, `GET /v1/forecasts/{id}`, and
+  `GET /v1/forecasts/{id}/lineage`.
+- Storage: `ScenarioRepository` and `ForecastRepository` added to the unit of
+  work (in-memory + SQLAlchemy), with ORM tables and Alembic migration `0002`.
+- Forecast golden eval set (`evals/cases/golden_forecast.json`) with pinned
+  per-period totals; the runner and smoke test now cover both case files.
+- New `unsupported_media_type` (415) error code; validation-error details are
+  sanitized to JSON-safe primitives.
+
 ### Added — Milestone M1 (persistence)
 
 - Storage layer (`balancelab.storage`): typed repository Protocols

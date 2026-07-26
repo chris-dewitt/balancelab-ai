@@ -12,9 +12,12 @@ from fastapi import FastAPI
 
 from balancelab import __version__
 from balancelab.api.errors import register_exception_handlers
+from balancelab.api.forecasts import router as forecasts_router
 from balancelab.api.health import router as health_router
+from balancelab.api.ingest_routes import router as ingest_router
 from balancelab.api.middleware import CorrelationIdMiddleware
 from balancelab.api.routes import router as v1_router
+from balancelab.api.scenarios import router as scenarios_router
 from balancelab.config import Settings, get_settings
 from balancelab.storage import create_unit_of_work_factory
 from balancelab.telemetry import configure_logging
@@ -41,6 +44,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(v1_router)
+    app.include_router(ingest_router)
+    app.include_router(scenarios_router)
+    app.include_router(forecasts_router)
 
     return app
 
