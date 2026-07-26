@@ -29,6 +29,7 @@ class ErrorCode(StrEnum):
     CONFLICT = "conflict"
     RECONCILIATION_FAILED = "reconciliation_failed"
     POLICY_VIOLATION = "policy_violation"
+    UNSUPPORTED_MEDIA_TYPE = "unsupported_media_type"
     UNPROCESSABLE = "unprocessable"
     INTERNAL_ERROR = "internal_error"
 
@@ -41,6 +42,7 @@ HTTP_STATUS_BY_CODE: dict[ErrorCode, int] = {
     ErrorCode.CONFLICT: 409,
     ErrorCode.RECONCILIATION_FAILED: 422,
     ErrorCode.POLICY_VIOLATION: 403,
+    ErrorCode.UNSUPPORTED_MEDIA_TYPE: 415,
     ErrorCode.UNPROCESSABLE: 422,
     ErrorCode.INTERNAL_ERROR: 500,
 }
@@ -110,3 +112,9 @@ class PolicyViolationError(BalanceLabError):
     """A guarded policy (e.g. synthetic-data-only) was violated."""
 
     code = ErrorCode.POLICY_VIOLATION
+
+
+class UnsupportedMediaTypeError(BalanceLabError):
+    """The request body content type is not supported."""
+
+    code = ErrorCode.UNSUPPORTED_MEDIA_TYPE

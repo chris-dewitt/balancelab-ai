@@ -14,7 +14,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import Boolean, Date, DateTime, Numeric, String
+from sqlalchemy import Boolean, Date, DateTime, Integer, Numeric, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -45,5 +45,29 @@ class SnapshotRow(Base):
     total_liabilities: Mapped[Decimal] = mapped_column(Numeric(20, 2), nullable=False)
     total_equity: Mapped[Decimal] = mapped_column(Numeric(20, 2), nullable=False)
     balances: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+
+
+class ScenarioRow(Base):
+    __tablename__ = "scenarios"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    base_portfolio_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    horizon_periods: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+
+
+class ForecastRunRow(Base):
+    __tablename__ = "forecast_runs"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    scenario_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    base_portfolio_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    currency: Mapped[str] = mapped_column(String(3), nullable=False)
+    horizon_periods: Mapped[int] = mapped_column(Integer, nullable=False)
+    formula_version: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)

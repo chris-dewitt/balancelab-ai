@@ -16,22 +16,16 @@ orchestrate typed inputs, persistence, and outputs.
 
 from __future__ import annotations
 
-from typing import Annotated
+from fastapi import APIRouter, status
 
-from fastapi import APIRouter, Depends, status
-
-from balancelab.api.dependencies import get_uow
+from balancelab.api.dependencies import UowDep
 from balancelab.api.schemas import SnapshotRequest, SyntheticPortfolioRequest
 from balancelab.calc.engine import compute_snapshot
 from balancelab.domain.models import Portfolio, Snapshot
 from balancelab.errors import NotFoundError
-from balancelab.storage import UnitOfWork
 from balancelab.synthetic.generator import ensure_synthetic, generate_synthetic_portfolio
 
 router = APIRouter(prefix="/v1", tags=["balancelab"])
-
-# Per-request unit of work, committed on success (see api.dependencies).
-UowDep = Annotated[UnitOfWork, Depends(get_uow)]
 
 
 @router.post(

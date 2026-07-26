@@ -12,7 +12,9 @@ from collections.abc import Callable
 
 from balancelab.config import Settings, get_settings
 from balancelab.storage.interfaces import (
+    ForecastRepository,
     PortfolioRepository,
+    ScenarioRepository,
     SnapshotRepository,
     UnitOfWork,
 )
@@ -21,9 +23,11 @@ from balancelab.storage.memory import InMemoryDatabase, InMemoryUnitOfWork
 UnitOfWorkFactory = Callable[[], UnitOfWork]
 
 __all__ = [
+    "ForecastRepository",
     "InMemoryDatabase",
     "InMemoryUnitOfWork",
     "PortfolioRepository",
+    "ScenarioRepository",
     "SnapshotRepository",
     "UnitOfWork",
     "UnitOfWorkFactory",

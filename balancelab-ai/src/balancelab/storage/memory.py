@@ -12,7 +12,9 @@ database persists across transactions.
 
 from __future__ import annotations
 
+from balancelab.domain.forecast import ForecastRun
 from balancelab.domain.models import Portfolio, Snapshot
+from balancelab.domain.scenario import Scenario
 
 
 class InMemoryPortfolioRepository:
@@ -38,12 +40,44 @@ class InMemorySnapshotRepository:
         return self._by_id.get(snapshot_id)
 
 
+class InMemoryScenarioRepository:
+    def __init__(self) -> None:
+        # Insertion order preserved; list() returns newest first.
+        self._by_id: dict[str, Scenario] = {}
+
+    def add(self, scenario: Scenario) -> Scenario:
+        return self._by_id.setdefault(scenario.id, scenario)
+
+    def get(self, scenario_id: str) -> Scenario | None:
+        return self._by_id.get(scenario_id)
+
+    def list(self, limit: int = 50, offset: int = 0) -> tuple[Scenario, ...]:
+        newest_first = list(reversed(self._by_id.values()))
+        return tuple(newest_first[offset : offset + limit])
+
+    def delete(self, scenario_id: str) -> bool:
+        return self._by_id.pop(scenario_id, None) is not None
+
+
+class InMemoryForecastRepository:
+    def __init__(self) -> None:
+        self._by_id: dict[str, ForecastRun] = {}
+
+    def add(self, run: ForecastRun) -> ForecastRun:
+        return self._by_id.setdefault(run.id, run)
+
+    def get(self, run_id: str) -> ForecastRun | None:
+        return self._by_id.get(run_id)
+
+
 class InMemoryDatabase:
     """Process-lifetime store shared across units of work."""
 
     def __init__(self) -> None:
         self.portfolios = InMemoryPortfolioRepository()
         self.snapshots = InMemorySnapshotRepository()
+        self.scenarios = InMemoryScenarioRepository()
+        self.forecasts = InMemoryForecastRepository()
 
 
 class InMemoryUnitOfWork:
@@ -55,6 +89,8 @@ class InMemoryUnitOfWork:
     def __init__(self, db: InMemoryDatabase) -> None:
         self.portfolios = db.portfolios
         self.snapshots = db.snapshots
+        self.scenarios = db.scenarios
+        self.forecasts = db.forecasts
 
     def __enter__(self) -> InMemoryUnitOfWork:
         return self

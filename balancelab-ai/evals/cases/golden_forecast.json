@@ -1,0 +1,34 @@
+{
+  "dataset": "balancelab-m1-forecast",
+  "version": "1",
+  "description": "Deterministic golden cases for the M1 forecast engine. Each case pins per-period category totals for a synthetic base portfolio and a growth-rate scenario, catching numerical regressions and confirming the balance-sheet identity holds every period.",
+  "data_origin": "synthetic",
+  "cases": [
+    {
+      "id": "forecast-seed-7",
+      "kind": "forecast",
+      "seed": 7,
+      "asset_growth": "0.05",
+      "liability_growth": "0.02",
+      "horizon": 3,
+      "expect": {
+        "total_assets": ["6583581.11", "6912760.16", "7258398.17", "7621318.07"],
+        "total_liabilities": ["3801462.86", "3877492.11", "3955041.95", "4034142.79"],
+        "total_equity": ["2782118.25", "3035268.05", "3303356.22", "3587175.28"]
+      }
+    },
+    {
+      "id": "forecast-seed-42",
+      "kind": "forecast",
+      "seed": 42,
+      "asset_growth": "0.03",
+      "liability_growth": "0.03",
+      "horizon": 2,
+      "expect": {
+        "total_assets": ["5263452.51", "5421356.09", "5583996.77"],
+        "total_liabilities": ["2737328.97", "2819448.84", "2904032.30"],
+        "total_equity": ["2526123.54", "2601907.25", "2679964.47"]
+      }
+    }
+  ]
+}
