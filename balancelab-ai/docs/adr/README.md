@@ -11,3 +11,4 @@ Lightweight records of significant decisions (see [ADR 0001](0001-record-archite
 | [0005](0005-deferred-scope.md) | Deferred scope after M0 | Accepted |
 | [0006](0006-persistence-and-storage-boundary.md) | Persistence and the storage boundary | Accepted |
 | [0007](0007-forecast-model-and-upload-validation.md) | Forecast model and upload validation | Accepted |
+| [0008](0008-lineage-graph-reconciliation-export.md) | Lineage graph, reconciliation, and export | Accepted |

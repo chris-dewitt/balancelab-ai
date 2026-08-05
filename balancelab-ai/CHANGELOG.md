@@ -6,6 +6,26 @@ milestone-based versioning during pre-release (see [`SPEC.md`](SPEC.md) §13).
 
 ## [Unreleased]
 
+### Added — Milestone M2 (lineage graph, reconciliations, exports)
+
+- Calculation-lineage graph (`balancelab.domain.lineage`): `build_lineage_graph`
+  turns a flat node tuple into a directed graph (edges, roots, external sources
+  in deterministic order); `resolve_lineage` returns the transitive input closure
+  explaining a single figure.
+- Reconciliation records (`balancelab.domain.reconciliation`,
+  `balancelab.reconcile`): derived deterministically — one identity check for a
+  snapshot, one per period for a forecast, each with residual and tolerance.
+- Export bundles (`balancelab.domain.export`, `balancelab.export`): self-contained
+  `SnapshotExport` / `ForecastExport` (inputs + result + reconciliation + lineage
+  graph), tagged with an export schema version.
+- API: `GET /v1/snapshots/{id}/lineage`, `/lineage/graph`, `/lineage/{node_id}`,
+  `/reconciliation`, and `/export` (download); the same family under
+  `/v1/forecasts/{id}`.
+- Golden report tests: pinned snapshot/forecast export fixtures under
+  `tests/golden/` with an id/timestamp normalizer (`tests/golden_utils.py`).
+- New `unsupported_media_type` error already existed; no schema changes to
+  persisted tables (M2 additions are all derived/computed on demand).
+
 ### Added — Milestone M1 (upload validation, scenarios, forecast core)
 
 - Upload validation: `POST /v1/portfolios/validate` accepts a candidate balance

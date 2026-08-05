@@ -20,6 +20,15 @@ Case kinds:
 | `adversarial` | Corrupts a balanced portfolio and asserts the engine raises a reconciliation error → **invariant enforcement**. |
 | `forecast` | Pins per-period category totals for a seed + growth-rate scenario over a horizon → **forecast regression gate** (and confirms the identity holds each period). |
 
+### Golden report tests (M2)
+
+Beyond the eval datasets, `tests/test_golden_reports.py` pins whole **export
+bundles** (snapshot and forecast) as golden fixtures under `tests/golden/`. Random
+ids and timestamps are normalized to stable placeholders (see
+`tests/golden_utils.py`) while preserving referential structure, so a change to
+any reported value, the bundle shape, or the lineage graph fails the test. Regenerate
+the fixtures deliberately — and note it in the changelog — when the change is intended.
+
 ## Metrics (M0)
 
 - **Numerical reproducibility:** identical seed → identical figures (deterministic
