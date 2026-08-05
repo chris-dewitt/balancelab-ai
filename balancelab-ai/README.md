@@ -7,16 +7,16 @@ runs **deterministic** balance-sheet forecasts, and explains every result with
 complete calculation lineage. Authoritative numbers are always computed by code,
 never authored by a language model.
 
-> **Status — M0 complete; M1 complete.** This repository ships the deterministic
-> core (synthetic-data boundary, typed domain schemas, balance-sheet formulas
-> with full lineage, FastAPI surface, telemetry, evaluation smoke tests, CI) and
-> all of **M1**: a typed persistence boundary with in-memory and
-> SQLAlchemy/Postgres backends and Alembic migrations; upload validation;
-> versioned scenarios with CRUD; and a deterministic forecast engine with full
-> lineage. Remaining scope (M2–M5: lineage graph/exports, natural-language
-> scenario drafting + approval, methodology retrieval, explanations, ML
-> comparison) is not yet built. **Do not treat planned capabilities as shipped.**
-> See [`SPEC.md`](SPEC.md) §13 for the milestone map.
+> **Status — M0–M2 complete.** This repository ships the deterministic core and
+> **M1** (persistence boundary with in-memory + SQLAlchemy/Postgres backends and
+> Alembic migrations, upload validation, versioned scenarios with CRUD, and a
+> deterministic forecast engine) plus **M2**: a first-class calculation-lineage
+> graph with per-node resolution, reconciliation records for snapshots and
+> forecasts, downloadable export bundles, and golden report tests. Remaining
+> scope (M3–M5: natural-language scenario drafting + approval, methodology
+> retrieval, explanations, ML comparison) is not yet built. **Do not treat
+> planned capabilities as shipped.** See [`SPEC.md`](SPEC.md) §13 for the
+> milestone map.
 
 ## What problem this solves
 
@@ -143,11 +143,16 @@ The HTTP equivalent: `POST /v1/portfolios/synthetic` then `POST /v1/snapshots`.
 | GET  | `/v1/portfolios/{id}` | Retrieve a stored portfolio (structured 404 if absent). |
 | POST | `/v1/snapshots` | Compute and persist a fully-traced deterministic snapshot (enforces the synthetic-only boundary). |
 | GET  | `/v1/snapshots/{id}` | Retrieve a stored snapshot (structured 404 if absent). |
+| GET  | `/v1/snapshots/{id}/lineage` · `/lineage/graph` | Snapshot lineage as a flat list / directed graph. |
+| GET  | `/v1/snapshots/{id}/lineage/{node_id}` | Resolve the sub-graph explaining one figure. |
+| GET  | `/v1/snapshots/{id}/reconciliation` | The snapshot's reconciliation record. |
+| GET  | `/v1/snapshots/{id}/export` | Download a self-contained snapshot bundle (inputs + result + reconciliation + lineage). |
 | POST | `/v1/scenarios` | Create a forecast scenario over an existing portfolio. |
 | GET  | `/v1/scenarios` · `/v1/scenarios/{id}` | List / retrieve scenarios. |
 | DELETE | `/v1/scenarios/{id}` | Delete a scenario. |
 | POST | `/v1/forecasts` | Run and persist a deterministic forecast for a scenario. |
-| GET  | `/v1/forecasts/{id}` · `/v1/forecasts/{id}/lineage` | Retrieve a forecast run / its calculation lineage. |
+| GET  | `/v1/forecasts/{id}` · `/lineage` · `/lineage/graph` · `/lineage/{node_id}` | Retrieve a forecast run and its lineage (list / graph / resolved node). |
+| GET  | `/v1/forecasts/{id}/reconciliation` · `/export` | Per-period reconciliation / downloadable forecast bundle. |
 
 All responses carry an `X-Correlation-ID`; errors use a structured body
 (`code`, `message`, `correlation_id`, `details`). See
@@ -182,8 +187,10 @@ and least-privilege containers.
   rate shocks, macro paths, and per-account assumptions are deferred.
 - Upload validation is a dry run — validated uploads are not yet admitted to
   storage (persisting uploads is deferred).
+- Reconciliations and export bundles are computed on demand from stored results
+  (not themselves persisted); export is JSON only.
 - Natural-language scenario drafting, approval workflow, methodology retrieval,
-  explanations, and ML comparison are not built yet (M2–M5).
+  explanations, and ML comparison are not built yet (M3–M5).
 - The synthetic generator produces balance-sheet totals only; income,
   liquidity, and risk calculations are deferred.
 

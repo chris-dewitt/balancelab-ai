@@ -1,0 +1,409 @@
+{
+  "exported_at": "<ts>",
+  "lineage": {
+    "edges": [
+      {
+        "from_id": "<acct:0>",
+        "to_id": "<calc:0>"
+      },
+      {
+        "from_id": "<acct:1>",
+        "to_id": "<calc:1>"
+      },
+      {
+        "from_id": "<acct:2>",
+        "to_id": "<calc:2>"
+      },
+      {
+        "from_id": "<acct:3>",
+        "to_id": "<calc:3>"
+      },
+      {
+        "from_id": "<acct:4>",
+        "to_id": "<calc:4>"
+      },
+      {
+        "from_id": "<acct:5>",
+        "to_id": "<calc:5>"
+      },
+      {
+        "from_id": "<calc:0>",
+        "to_id": "<calc:6>"
+      },
+      {
+        "from_id": "<calc:1>",
+        "to_id": "<calc:6>"
+      },
+      {
+        "from_id": "<calc:2>",
+        "to_id": "<calc:6>"
+      },
+      {
+        "from_id": "<calc:3>",
+        "to_id": "<calc:7>"
+      },
+      {
+        "from_id": "<calc:4>",
+        "to_id": "<calc:7>"
+      },
+      {
+        "from_id": "<calc:5>",
+        "to_id": "<calc:8>"
+      },
+      {
+        "from_id": "<calc:6>",
+        "to_id": "<calc:9>"
+      },
+      {
+        "from_id": "<calc:7>",
+        "to_id": "<calc:9>"
+      },
+      {
+        "from_id": "<calc:8>",
+        "to_id": "<calc:9>"
+      }
+    ],
+    "nodes": [
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:0>",
+        "inputs": [
+          "<acct:0>"
+        ],
+        "label": "asset:Cash and Equivalents",
+        "unit": "USD",
+        "value": "2766506.19"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:1>",
+        "inputs": [
+          "<acct:1>"
+        ],
+        "label": "asset:Marketable Securities",
+        "unit": "USD",
+        "value": "3362019.83"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:2>",
+        "inputs": [
+          "<acct:2>"
+        ],
+        "label": "asset:Loans Receivable",
+        "unit": "USD",
+        "value": "455055.09"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:3>",
+        "inputs": [
+          "<acct:3>"
+        ],
+        "label": "liability:Customer Deposits",
+        "unit": "USD",
+        "value": "2257652.12"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:4>",
+        "inputs": [
+          "<acct:4>"
+        ],
+        "label": "liability:Short-Term Borrowings",
+        "unit": "USD",
+        "value": "1543810.74"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:5>",
+        "inputs": [
+          "<acct:5>"
+        ],
+        "label": "equity:Total Equity",
+        "unit": "USD",
+        "value": "2782118.25"
+      },
+      {
+        "formula": "sum(account.balance for account in category)",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:6>",
+        "inputs": [
+          "<calc:0>",
+          "<calc:1>",
+          "<calc:2>"
+        ],
+        "label": "total_asset",
+        "unit": "USD",
+        "value": "6583581.11"
+      },
+      {
+        "formula": "sum(account.balance for account in category)",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:7>",
+        "inputs": [
+          "<calc:3>",
+          "<calc:4>"
+        ],
+        "label": "total_liability",
+        "unit": "USD",
+        "value": "3801462.86"
+      },
+      {
+        "formula": "sum(account.balance for account in category)",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:8>",
+        "inputs": [
+          "<calc:5>"
+        ],
+        "label": "total_equity",
+        "unit": "USD",
+        "value": "2782118.25"
+      },
+      {
+        "formula": "total_asset - (total_liability + total_equity)",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:9>",
+        "inputs": [
+          "<calc:6>",
+          "<calc:7>",
+          "<calc:8>"
+        ],
+        "label": "balance_residual",
+        "unit": "USD",
+        "value": "0.00"
+      }
+    ],
+    "root_ids": [
+      "<calc:9>"
+    ],
+    "source_ids": [
+      "<acct:0>",
+      "<acct:1>",
+      "<acct:2>",
+      "<acct:3>",
+      "<acct:4>",
+      "<acct:5>"
+    ]
+  },
+  "portfolio": {
+    "accounts": [
+      {
+        "balance": "2766506.19",
+        "category": "asset",
+        "currency": "USD",
+        "id": "<acct:0>",
+        "instruments": [],
+        "name": "Cash and Equivalents"
+      },
+      {
+        "balance": "3362019.83",
+        "category": "asset",
+        "currency": "USD",
+        "id": "<acct:1>",
+        "instruments": [],
+        "name": "Marketable Securities"
+      },
+      {
+        "balance": "455055.09",
+        "category": "asset",
+        "currency": "USD",
+        "id": "<acct:2>",
+        "instruments": [],
+        "name": "Loans Receivable"
+      },
+      {
+        "balance": "2257652.12",
+        "category": "liability",
+        "currency": "USD",
+        "id": "<acct:3>",
+        "instruments": [],
+        "name": "Customer Deposits"
+      },
+      {
+        "balance": "1543810.74",
+        "category": "liability",
+        "currency": "USD",
+        "id": "<acct:4>",
+        "instruments": [],
+        "name": "Short-Term Borrowings"
+      },
+      {
+        "balance": "2782118.25",
+        "category": "equity",
+        "currency": "USD",
+        "id": "<acct:5>",
+        "instruments": [],
+        "name": "Total Equity"
+      }
+    ],
+    "as_of_date": "2025-12-31",
+    "created_at": "<ts>",
+    "currency": "USD",
+    "id": "<port:0>",
+    "name": "Synthetic Demo Bank",
+    "provenance": {
+      "content_checksum": null,
+      "generator": "synthetic-generator@1",
+      "license_notes": "Synthetic data generated by BalanceLab; no real entity.",
+      "origin": "synthetic",
+      "retrieved_at": null,
+      "seed": 7,
+      "source_uri": null
+    }
+  },
+  "reconciliation": {
+    "checks": [
+      {
+        "passed": true,
+        "period": null,
+        "residual": "0.00",
+        "tolerance": "0.01",
+        "total_assets": "6583581.11",
+        "total_equity": "2782118.25",
+        "total_liabilities": "3801462.86"
+      }
+    ],
+    "created_at": "<ts>",
+    "currency": "USD",
+    "id": "<recon:0>",
+    "passed": true,
+    "subject_id": "<snap:0>",
+    "subject_type": "snapshot"
+  },
+  "schema_version": "balancelab-export@1",
+  "snapshot": {
+    "as_of_date": "2025-12-31",
+    "balances": true,
+    "created_at": "<ts>",
+    "currency": "USD",
+    "id": "<snap:0>",
+    "lineage": [
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:0>",
+        "inputs": [
+          "<acct:0>"
+        ],
+        "label": "asset:Cash and Equivalents",
+        "unit": "USD",
+        "value": "2766506.19"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:1>",
+        "inputs": [
+          "<acct:1>"
+        ],
+        "label": "asset:Marketable Securities",
+        "unit": "USD",
+        "value": "3362019.83"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:2>",
+        "inputs": [
+          "<acct:2>"
+        ],
+        "label": "asset:Loans Receivable",
+        "unit": "USD",
+        "value": "455055.09"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:3>",
+        "inputs": [
+          "<acct:3>"
+        ],
+        "label": "liability:Customer Deposits",
+        "unit": "USD",
+        "value": "2257652.12"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:4>",
+        "inputs": [
+          "<acct:4>"
+        ],
+        "label": "liability:Short-Term Borrowings",
+        "unit": "USD",
+        "value": "1543810.74"
+      },
+      {
+        "formula": "source",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:5>",
+        "inputs": [
+          "<acct:5>"
+        ],
+        "label": "equity:Total Equity",
+        "unit": "USD",
+        "value": "2782118.25"
+      },
+      {
+        "formula": "sum(account.balance for account in category)",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:6>",
+        "inputs": [
+          "<calc:0>",
+          "<calc:1>",
+          "<calc:2>"
+        ],
+        "label": "total_asset",
+        "unit": "USD",
+        "value": "6583581.11"
+      },
+      {
+        "formula": "sum(account.balance for account in category)",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:7>",
+        "inputs": [
+          "<calc:3>",
+          "<calc:4>"
+        ],
+        "label": "total_liability",
+        "unit": "USD",
+        "value": "3801462.86"
+      },
+      {
+        "formula": "sum(account.balance for account in category)",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:8>",
+        "inputs": [
+          "<calc:5>"
+        ],
+        "label": "total_equity",
+        "unit": "USD",
+        "value": "2782118.25"
+      },
+      {
+        "formula": "total_asset - (total_liability + total_equity)",
+        "formula_version": "balance-formulas@1",
+        "id": "<calc:9>",
+        "inputs": [
+          "<calc:6>",
+          "<calc:7>",
+          "<calc:8>"
+        ],
+        "label": "balance_residual",
+        "unit": "USD",
+        "value": "0.00"
+      }
+    ],
+    "portfolio_id": "<port:0>",
+    "total_assets": "6583581.11",
+    "total_equity": "2782118.25",
+    "total_liabilities": "3801462.86"
+  }
+}
