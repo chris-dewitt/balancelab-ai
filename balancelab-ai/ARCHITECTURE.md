@@ -1,9 +1,9 @@
 # Architecture
 
 This document describes the BalanceLab AI architecture as implemented through
-milestone **M1 (persistence)**, and the seams left for later milestones. It
-complements [`SPEC.md`](SPEC.md) §5 (which describes the full target system) by
-stating what is actually built today.
+milestone **M2 (lineage graph, reconciliations, exports)**, and the seams left
+for later milestones. It complements [`SPEC.md`](SPEC.md) §5 (which describes the
+full target system) by stating what is actually built today.
 
 ## Layering
 
@@ -107,12 +107,28 @@ issues rather than failing on the first, and never raises on bad input.
 
 ## Calculation lineage
 
-`Snapshot.lineage` is a tuple of `CalculationNode`s. Each node records its
-`label`, `formula`, `formula_version`, `inputs` (ids of upstream nodes or source
-accounts), `value`, and `unit`. Leaf nodes reference the source `Account` id;
-aggregate nodes reference the ids of the nodes they combine. This makes every
-displayed number traceable end-to-end, satisfying the MVP acceptance criterion
-that no figure is unexplained.
+`Snapshot.lineage` (and `ForecastRun.lineage`) is a tuple of `CalculationNode`s.
+Each node records its `label`, `formula`, `formula_version`, `inputs` (ids of
+upstream nodes or source accounts), `value`, and `unit`. Leaf nodes reference the
+source `Account` id; aggregate nodes reference the ids of the nodes they combine.
+This makes every displayed number traceable end-to-end, satisfying the MVP
+acceptance criterion that no figure is unexplained.
+
+### Lineage graph, reconciliation, and export (M2)
+
+`balancelab.domain.lineage` turns the flat node tuple into an explicit directed
+graph: `build_lineage_graph` derives edges (`from_id -> to_id`), `root_ids`
+(nodes consumed by nothing — the final figures), and `source_ids` (external
+inputs such as accounts), all in deterministic first-appearance order.
+`resolve_lineage(nodes, target_id)` returns the transitive input closure that
+explains a single figure — the API exposes this per node.
+
+`balancelab.reconcile` derives `Reconciliation` records (one identity check for a
+snapshot; one per period for a forecast) deterministically from stored results.
+`balancelab.export` assembles self-contained `SnapshotExport` / `ForecastExport`
+bundles — inputs, result, reconciliation, and lineage graph, tagged with an
+export schema version — served as downloadable JSON. All three are pure
+functions; nothing here performs I/O or persists.
 
 ## Error handling
 

@@ -20,7 +20,7 @@ The following are deferred to later milestones and must not be assumed present:
 | Upload validation for portfolios | M1 | Delivered (dry-run; admitting uploads to storage still deferred) |
 | Scenario/Assumption schemas + scenario CRUD + deterministic forecast core | M1 | Delivered |
 | Broader domain calcs (income, liquidity, risk); Curve/MacroPath assumptions | M1+ | Deferred |
-| Lineage graph persistence, reconciliations, exports, golden report tests | M2 | Deferred |
+| Lineage graph, reconciliations, exports, golden report tests | M2 | Delivered (lineage/reconciliation/export derived on demand, not persisted) |
 | Natural-language scenario drafting + human approval workflow + audit events | M3 | Deferred |
 | Methodology retrieval (RAG), faithful explanations, anomaly detection | M4 | Deferred |
 | ML forecast comparison, model registry, evaluation report, signature demo | M5 | Deferred |

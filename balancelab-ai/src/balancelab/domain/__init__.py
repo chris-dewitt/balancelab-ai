@@ -6,7 +6,9 @@ data and calculation lineage.
 
 from __future__ import annotations
 
+from balancelab.domain.export import ForecastExport, SnapshotExport
 from balancelab.domain.forecast import ForecastRun, ForecastValue
+from balancelab.domain.lineage import LineageEdge, LineageGraph
 from balancelab.domain.models import (
     Account,
     AccountCategory,
@@ -18,6 +20,11 @@ from balancelab.domain.models import (
     Provenance,
     Snapshot,
 )
+from balancelab.domain.reconciliation import (
+    Reconciliation,
+    ReconciliationCheck,
+    ReconciliationSubject,
+)
 from balancelab.domain.scenario import Assumption, AssumptionKind, Scenario
 
 __all__ = [
@@ -28,11 +35,18 @@ __all__ = [
     "CalculationNode",
     "CashFlow",
     "DataOrigin",
+    "ForecastExport",
     "ForecastRun",
     "ForecastValue",
     "Instrument",
+    "LineageEdge",
+    "LineageGraph",
     "Portfolio",
     "Provenance",
+    "Reconciliation",
+    "ReconciliationCheck",
+    "ReconciliationSubject",
     "Scenario",
+    "SnapshotExport",
     "Snapshot",
 ]

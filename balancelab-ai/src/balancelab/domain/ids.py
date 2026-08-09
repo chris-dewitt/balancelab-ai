@@ -19,6 +19,7 @@ CALC_NODE: Final = "calc"
 SCENARIO: Final = "scen"
 ASSUMPTION: Final = "asmp"
 FORECAST_RUN: Final = "frun"
+RECONCILIATION: Final = "recon"
 
 
 def new_id(prefix: str) -> str:
